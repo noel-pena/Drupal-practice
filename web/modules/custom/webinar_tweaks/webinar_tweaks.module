@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for Webinar Tweaks.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use \Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_entity_presave().
+ */
+function webinar_tweaks_entity_presave(EntityInterface $entity) {
+  // Check if we are saving a 'webinar' node.
+  if ($entity->getEntityTypeId() === 'node' && $entity->bundle() === 'webinar') {
+    
+    // 1. Get the current title.
+    $title = $entity->label();
+    $prefix = "Webinar: ";
+
+    // 2. Check if the title starts with the prefix.
+    if (!str_starts_with($title, $prefix)) {
+      // 3. Set the new title.
+      $entity->setTitle($prefix . $title);
+      // Optional: Log it so we know it happened.
+      \Drupal::logger('webinar_tweaks')->info('Fixed title for @title', ['@title' => $entity->label()]);
+    }
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function webinar_tweaks_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+    if ($form_id === 'node_webinar_edit_form') {
+        $form['promote']['#access'] = FALSE;
+        $form['#validate'][] = 'webinar_tweaks_validate';
+    };
+
+  // Log the ID of every form we see.
+  \Drupal::logger('webinar_tweaks')->info('Form ID: @id', ['@id' => $form_id]);
+}

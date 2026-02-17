@@ -1,0 +1,5 @@
+name: "Webinar Tweaks"
+type: module
+description: "Drupal dummy test"
+core_version_requirement: ^11
+package: Custom
