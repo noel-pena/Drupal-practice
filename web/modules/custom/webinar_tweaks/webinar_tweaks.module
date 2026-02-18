@@ -33,11 +33,26 @@ function webinar_tweaks_entity_presave(EntityInterface $entity) {
  * Implements hook_form_alter().
  */
 function webinar_tweaks_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-    if ($form_id === 'node_webinar_edit_form') {
-        $form['promote']['#access'] = FALSE;
-        $form['#validate'][] = 'webinar_tweaks_validate';
-    };
+  // We want to target BOTH the "Edit" form AND the "Add" form.
+  // The IDs are: 'node_webinar_edit_form' and 'node_webinar_form'.
+  if ($form_id === 'node_webinar_edit_form' || $form_id === 'node_webinar_form') {
+    // Hide the promote checkbox.
+    $form['promote']['#access'] = FALSE;
 
-  // Log the ID of every form we see.
+    // Attach our custom validation handler.
+    $form['#validate'][] = 'webinar_tweaks_validate';
+  }
+
+  // Log the ID so you can see which one is being used.
   \Drupal::logger('webinar_tweaks')->info('Form ID: @id', ['@id' => $form_id]);
+}
+
+function webinar_tweaks_validate(&$form, FormStateInterface $form_state) {
+  // 1. Get the raw array for the 'title' field.
+  $title = $form_state->getValue(['title', 0, 'value']);
+
+  // 3. Run the logic.
+  if (strlen($title) < 5) {
+    $form_state->setErrorByName('title', 'Title must be at least 5 characters long.');
+  }
 }
