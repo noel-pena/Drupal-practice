@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\node\NodeInterface;
 use \Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -13,19 +14,12 @@ use \Drupal\Core\Form\FormStateInterface;
  */
 function webinar_tweaks_entity_presave(EntityInterface $entity) {
   // Check if we are saving a 'webinar' node.
-  if ($entity->getEntityTypeId() === 'node' && $entity->bundle() === 'webinar') {
-    
-    // 1. Get the current title.
+  if ($entity instanceof NodeInterface && $entity->bundle() === 'webinar') {
     $title = $entity->label();
-    $prefix = "Webinar: ";
 
-    // 2. Check if the title starts with the prefix.
-    if (!str_starts_with($title, $prefix)) {
-      // 3. Set the new title.
-      $entity->setTitle($prefix . $title);
-      // Optional: Log it so we know it happened.
-      \Drupal::logger('webinar_tweaks')->info('Fixed title for @title', ['@title' => $entity->label()]);
-    }
+    $fixed_title = \Drupal::service('webinar_tweaks.title_manager')->fixTitle($title);
+
+    $entity->setTitle($fixed_title);
   }
 }
 

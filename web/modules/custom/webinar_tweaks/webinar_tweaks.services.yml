@@ -1,0 +1,3 @@
+services:
+  webinar_tweaks.title_manager:
+    class: Drupal\webinar_tweaks\Service\WebinarTitleManager
