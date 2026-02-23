@@ -1,0 +1,6 @@
+webinar_tweaks.simplecontentpage:
+  title: Simple Content Link
+  description: Linke to the simplecontent() method
+  route_name: webinar_tweaks.simplecontent
+  weight: 10
+  menu_name: main
